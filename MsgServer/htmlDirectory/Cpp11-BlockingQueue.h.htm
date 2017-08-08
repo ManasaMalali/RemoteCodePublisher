@@ -1,0 +1,128 @@
+<!---------------------------------------------------------------------------------------------------
+    Cpp11-BlockingQueue.h    Project - 3
+Soumyashree Mohan Reddy, SUID - 291434954, CSE687 - Object Oriented Design, Spring 2017
+--------------------------------------------------------------------------------------------------->
+<html>
+<head>
+<link rel = "stylesheet" type ="text/css" href = "Stylesheet.css">
+<script type = "text/javascript" src= "JavaScript.js"></script>
+</head>
+<body>
+  <h2>Cpp11-BlockingQueue.h</h2>   <hr />
+   <div class="indent">
+     <h3>Dependencies:</h3>
+   </div>
+   <hr />
+<pre>#ifndef CPP11_BLOCKINGQUEUE_H
+</pre><pre>#define CPP11_BLOCKINGQUEUE_H
+</pre><pre>///////////////////////////////////////////////////////////////
+</pre><pre>// Cpp11-BlockingQueue.h - Thread-safe Blocking Queue        //
+</pre><pre>// ver 1.1                                                   //
+</pre><pre>// Jim Fawcett, CSE687 - Object Oriented Design, Spring 2015 //
+</pre><pre>///////////////////////////////////////////////////////////////
+</pre><pre>/*
+</pre><pre> * Package Operations:
+</pre><pre> * -------------------
+</pre><pre> * This package contains one thread-safe class: BlockingQueue&lt;T&gt;.
+</pre><pre> * Its purpose is to support sending messages between threads.
+</pre><pre> * It is implemented using C++11 threading constructs including 
+</pre><pre> * std::condition_variable and std::mutex.  The underlying storage
+</pre><pre> * is provided by the non-thread-safe std::queue&lt;T&gt;.
+</pre><pre> *
+</pre><pre> * Required Files:
+</pre><pre> * ---------------
+</pre><pre> * Cpp11-BlockingQueue.h
+</pre><pre> *
+</pre><pre> * Build Process:
+</pre><pre> * --------------
+</pre><pre> * devenv Cpp11-BlockingQueue.sln /rebuild debug
+</pre><pre> *
+</pre><pre> * Maintenance History:
+</pre><pre> * --------------------
+</pre><pre> * ver 1.1 : 26 Jan 2015
+</pre><pre> * - added copy constructor and assignment operator
+</pre><pre> * ver 1.0 : 03 Mar 2014
+</pre><pre> * - first release
+</pre><pre> *
+</pre><pre> * ToDo:
+</pre><pre> * -----
+</pre><pre> * - add move constructor and move assignment
+</pre><pre> */
+</pre><pre>
+</pre><pre>#include &lt;condition_variable&gt;
+</pre><pre>#include &lt;mutex&gt;
+</pre><pre>#include &lt;thread&gt;
+</pre><pre>#include &lt;queue&gt;
+</pre><pre>#include &lt;string&gt;
+</pre><pre>#include &lt;iostream&gt;
+</pre><pre>#include &lt;sstream&gt;
+</pre><pre>
+</pre><pre>template &lt;typename T&gt;
+</pre><button onclick="toggle(1)">-</button><pre>class BlockingQueue {</pre><div id="1"><button onclick="toggle(2)">-</button><pre>public:</pre><div id="2"><pre>  BlockingQueue() {}
+</pre></div></br>
+<pre>  BlockingQueue(const BlockingQueue&lt;T&gt;&amp;);
+</pre><pre>  BlockingQueue&lt;T&gt;&amp; operator=(const BlockingQueue&lt;T&gt;&amp;);
+</pre><pre>  T deQ();
+</pre><pre>  void enQ(const T&amp; t);
+</pre><pre>  size_t size();
+</pre><pre>private:
+</pre><pre>  std::queue&lt;T&gt; q_;
+</pre><pre>  std::mutex mtx_;
+</pre><pre>  std::condition_variable cv_;
+</pre><pre>};
+</pre></div></br>
+<pre>
+</pre><pre>template&lt;typename T&gt;
+</pre><pre>BlockingQueue&lt;T&gt;::BlockingQueue(const BlockingQueue&lt;T&gt;&amp; bq) : q_(bq.q_)
+</pre><button onclick="toggle(3)">-</button><pre>{</pre><div id="3"><pre>  /* can&apos;t copy mutex or condition variable, so use default members */
+</pre><pre>}
+</pre></div></br>
+<pre>
+</pre><pre>template&lt;typename T&gt;
+</pre><pre>BlockingQueue&lt;T&gt;&amp; BlockingQueue&lt;T&gt;::operator=(const BlockingQueue&lt;T&gt;&amp; bq)
+</pre><button onclick="toggle(4)">-</button><pre>{</pre><div id="4"><pre>  if (this == &amp;bq) return *this;
+</pre><pre>  q_ = bq.q_;
+</pre><pre>  /* can&apos;t assign mutex or condition variable so use target&apos;s */
+</pre><pre>  return *this;
+</pre><pre>}
+</pre></div></br>
+<pre>
+</pre><pre>template&lt;typename T&gt;
+</pre><pre>T BlockingQueue&lt;T&gt;::deQ()
+</pre><button onclick="toggle(5)">-</button><pre>{</pre><div id="5"><pre>  std::unique_lock&lt;std::mutex&gt; l(mtx_);
+</pre><pre>  if(q_.size() &gt; 0)
+</pre><pre>  {
+</pre><pre>    T temp = q_.front();
+</pre><pre>    q_.pop();
+</pre><pre>    return temp;
+</pre><pre>  }
+</pre><pre>  // may have spurious returns so loop on !condition
+</pre><pre>
+</pre><pre>  while (q_.size() == 0)
+</pre><pre>    cv_.wait(l, [this] () { return q_.size() &gt; 0; });
+</pre><pre>  T temp = q_.front();
+</pre><pre>  q_.pop();
+</pre><pre>  return temp;
+</pre><pre>}
+</pre></div></br>
+<pre>
+</pre><pre>template&lt;typename T&gt;
+</pre><pre>void BlockingQueue&lt;T&gt;::enQ(const T&amp; t)
+</pre><button onclick="toggle(6)">-</button><pre>{</pre><div id="6"><pre>  {
+</pre><pre>    std::lock_guard&lt;std::mutex&gt; l(mtx_);
+</pre><pre>    q_.push(t);
+</pre><pre>  }
+</pre><pre>  cv_.notify_one();
+</pre><pre>}
+</pre></div></br>
+<pre>
+</pre><pre>template&lt;typename T&gt;
+</pre><pre>size_t BlockingQueue&lt;T&gt;::size()
+</pre><button onclick="toggle(7)">-</button><pre>{</pre><div id="7"><pre>  std::lock_guard&lt;std::mutex&gt; l(mtx_);
+</pre><pre>  return q_.size();
+</pre><pre>}
+</pre></div></br>
+<pre>
+</pre><pre>#endif
+</pre></body>
+</html>

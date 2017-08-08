@@ -1,0 +1,70 @@
+<!---------------------------------------------------------------------------------------------------
+    Parent.h    Project - 3
+Soumyashree Mohan Reddy, SUID - 291434954, CSE687 - Object Oriented Design, Spring 2017
+--------------------------------------------------------------------------------------------------->
+<html>
+<head>
+<link rel = "stylesheet" type ="text/css" href = "Stylesheet.css">
+<script type = "text/javascript" src= "JavaScript.js"></script>
+</head>
+<body>
+  <h2>Parent.h</h2>   <hr />
+   <div class="indent">
+     <h3>Dependencies:</h3>
+<a href =Child2.h.htm>Child2.h </a> </br>
+
+<a href =Child.h.htm>Child.h </a> </br>
+
+<a href =Invalid.h.htm>Invalid.h </a> </br>
+
+   </div>
+   <hr />
+<pre>#ifndef SCOPESTACK_H
+</pre><pre>#define SCOPESTACK_H
+</pre><pre>#pragma once
+</pre><pre>
+</pre><pre>
+</pre><pre>#include &quot;Child2.h&quot;
+</pre><pre>#include &quot;Child.h&quot;
+</pre><pre>#include &quot;Invalid.h&quot;
+</pre><pre>#include &lt;list&gt;
+</pre><pre>
+</pre><pre>
+</pre><pre>namespace parent1
+</pre><pre>{
+</pre><pre>	namespace parent2
+</pre><pre>	{
+</pre><pre>		template&lt;typename T&gt;
+</pre><button onclick="toggle(4)">-</button><pre>		class Parent {</pre><div id="4"><pre>			using namespace ChildTest;
+</pre><pre>		public:
+</pre><pre>			void push(const T&amp; item);
+</pre><pre>			T pop();
+</pre><pre>		private:
+</pre><pre>			data d;
+</pre><pre>			std::list&lt;T&gt; stack;
+</pre><pre>			Child child;
+</pre><pre>		};
+</pre></div></br>
+<pre>
+</pre><pre>
+</pre><pre>		template&lt;class T&gt;
+</pre><pre>		void Parent&lt;T&gt;::push(const T&amp; item)
+</pre><button onclick="toggle(5)">-</button><pre>		{</pre><div id="5"><pre>			stack.push_back(item);
+</pre><pre>		}
+</pre><pre>
+</pre></div></br>
+<pre>		template&lt;class T&gt;
+</pre><pre>		T Parent&lt;T&gt;::pop()
+</pre><pre>		
+</pre><button onclick="toggle(6)">-</button><pre>		{</pre><div id="6"><pre>			T item = stack.back();
+</pre><pre>			stack.pop_back();
+</pre><pre>			globalData++;
+</pre><pre>			return item;
+</pre><pre>		}
+</pre><pre>	}
+</pre></div></br>
+<pre>
+</pre><pre>}
+</pre><pre>#endif
+</pre></body>
+</html>

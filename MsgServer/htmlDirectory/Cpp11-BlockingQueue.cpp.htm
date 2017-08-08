@@ -1,0 +1,102 @@
+<!---------------------------------------------------------------------------------------------------
+    Cpp11-BlockingQueue.cpp    Project - 3
+Soumyashree Mohan Reddy, SUID - 291434954, CSE687 - Object Oriented Design, Spring 2017
+--------------------------------------------------------------------------------------------------->
+<html>
+<head>
+<link rel = "stylesheet" type ="text/css" href = "Stylesheet.css">
+<script type = "text/javascript" src= "JavaScript.js"></script>
+</head>
+<body>
+  <h2>Cpp11-BlockingQueue.cpp</h2>   <hr />
+   <div class="indent">
+     <h3>Dependencies:</h3>
+<a href =Cpp11-BlockingQueue.h.htm>Cpp11-BlockingQueue.h </a> </br>
+
+   </div>
+   <hr />
+<pre>///////////////////////////////////////////////////////////////
+</pre><pre>// Cpp11-BlockingQueue.cpp - Thread-safe Blocking Queue      //
+</pre><pre>// ver 1.1                                                   //
+</pre><pre>// Jim Fawcett, CSE687 - Object Oriented Design, Spring 2013 //
+</pre><pre>///////////////////////////////////////////////////////////////
+</pre><pre>
+</pre><pre>#include &lt;condition_variable&gt;
+</pre><pre>#include &lt;mutex&gt;
+</pre><pre>#include &lt;thread&gt;
+</pre><pre>#include &lt;queue&gt;
+</pre><pre>#include &lt;string&gt;
+</pre><pre>#include &lt;iostream&gt;
+</pre><pre>#include &lt;sstream&gt;
+</pre><pre>#include &quot;Cpp11-BlockingQueue.h&quot;
+</pre><pre>
+</pre><pre>#ifdef TEST_BLOCKINGQUEUE
+</pre><pre>
+</pre><pre>std::mutex ioLock;
+</pre><pre>
+</pre><pre>void test(BlockingQueue&lt;std::string&gt;* pQ)
+</pre><button onclick="toggle(22)">-</button><pre>{</pre><div id="22"><pre>  std::string msg;
+</pre><pre>  do
+</pre><pre>  {
+</pre><pre>    msg = pQ-&gt;deQ();
+</pre><pre>    {
+</pre><pre>      std::lock_guard&lt;std::mutex&gt; l(ioLock);
+</pre><pre>      std::cout &lt;&lt; &quot;\n  thread deQed &quot; &lt;&lt; msg.c_str();
+</pre><pre>    }
+</pre><pre>    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+</pre><pre>  } while(msg != &quot;quit&quot;);
+</pre><pre>}
+</pre></div></br>
+<pre>
+</pre><pre>int main()
+</pre><button onclick="toggle(23)">-</button><pre>{</pre><div id="23"><pre>  std::cout &lt;&lt; &quot;\n  Demonstrating C++11 Blocking Queue&quot;;
+</pre><pre>  std::cout &lt;&lt; &quot;\n ====================================&quot;;
+</pre><pre>
+</pre><pre>  BlockingQueue&lt;std::string&gt; q;
+</pre><pre>  std::thread t(test, &amp;q);
+</pre><pre>
+</pre><pre>  for(int i=0; i&lt;15; ++i)
+</pre><pre>  {
+</pre><pre>    std::ostringstream temp;
+</pre><pre>    temp &lt;&lt; i;
+</pre><pre>    std::string msg = std::string(&quot;msg#&quot;) + temp.str();
+</pre><pre>    {
+</pre><pre>      std::lock_guard&lt;std::mutex&gt; l(ioLock);
+</pre><pre>      std::cout &lt;&lt; &quot;\n   main enQing &quot; &lt;&lt; msg.c_str();
+</pre><pre>    }
+</pre><pre>    q.enQ(msg);
+</pre><pre>    std::this_thread::sleep_for(std::chrono::milliseconds(3));
+</pre><pre>  }
+</pre><pre>  q.enQ(&quot;quit&quot;);
+</pre><pre>  t.join();
+</pre><pre>
+</pre><pre>  std::cout &lt;&lt; &quot;\n&quot;;
+</pre><pre>  std::cout &lt;&lt; &quot;\n  Making copy of BlockingQueue&quot;;
+</pre><pre>  std::cout &lt;&lt; &quot;\n ------------------------------&quot;;
+</pre><pre>
+</pre><pre>  std::string msg = &quot;test&quot;;
+</pre><pre>  q.enQ(msg);
+</pre><pre>  std::cout &lt;&lt; &quot;\n  q.size() = &quot; &lt;&lt; q.size();
+</pre><pre>  BlockingQueue&lt;std::string&gt; q2 = q;  // make default copy
+</pre><pre>  std::cout &lt;&lt; &quot;\n  q2.size() = &quot; &lt;&lt; q2.size();
+</pre><pre>  std::cout &lt;&lt; &quot;\n  q element = &quot; &lt;&lt; (msg = q.deQ());
+</pre><pre>  q.enQ(msg);
+</pre><pre>  std::cout &lt;&lt; &quot;\n  q2 element = &quot; &lt;&lt; q2.deQ() &lt;&lt; &quot;\n&quot;;
+</pre><pre>
+</pre><pre>  std::cout &lt;&lt; &quot;\n  Assigning state of BlockingQueue&quot;;
+</pre><pre>  std::cout &lt;&lt; &quot;\n ----------------------------------&quot;;
+</pre><pre>  BlockingQueue&lt;std::string&gt; q3;
+</pre><pre>  q3 = q;
+</pre><pre>  std::cout &lt;&lt; &quot;\n  q.size() = &quot; &lt;&lt; q.size();
+</pre><pre>  std::cout &lt;&lt; &quot;\n  q3.size() = &quot; &lt;&lt; q3.size();
+</pre><pre>  std::cout &lt;&lt; &quot;\n  q element = &quot; &lt;&lt; q.deQ();
+</pre><pre>  q.enQ(msg);
+</pre><pre>  std::cout &lt;&lt; &quot;\n  q3 element = &quot; &lt;&lt; q3.deQ() &lt;&lt; &quot;\n&quot;;
+</pre><pre>
+</pre><pre>  std::cout &lt;&lt; &quot;\n\n&quot;;
+</pre><pre>}
+</pre></div></br>
+<pre>
+</pre><pre>#endif
+</pre></body>
+</html>
